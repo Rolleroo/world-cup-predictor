@@ -117,7 +117,7 @@ export function FixturePredictor({ fixture, focusTeamId, currentPct, deltas }: P
     }`}>
       {/* Main row */}
       <div
-        className="flex items-center gap-2 px-2.5 py-1.5 cursor-pointer select-none"
+        className="flex flex-wrap items-center gap-x-2 gap-y-1.5 px-2.5 py-1.5 cursor-pointer select-none"
         onClick={() => setExpanded((e) => !e)}
       >
         {/* Date + group */}
@@ -129,7 +129,7 @@ export function FixturePredictor({ fixture, focusTeamId, currentPct, deltas }: P
         </div>
 
         {/* Teams */}
-        <div className="flex-1 min-w-0 text-sm leading-none">
+        <div className="flex-1 min-w-[120px] text-sm leading-none">
           <span className={
             focusTeamId === fixture.homeTeamId ? "text-white font-bold" : "text-neutral-300"
           }>{home?.shortName ?? "?"}</span>
@@ -139,9 +139,9 @@ export function FixturePredictor({ fixture, focusTeamId, currentPct, deltas }: P
           }>{away?.shortName ?? "?"}</span>
         </div>
 
-        {/* Outcome buttons — colour only, no numbers */}
+        {/* Outcome buttons — full width row on mobile */}
         <div
-          className="flex gap-1 flex-shrink-0"
+          className="flex gap-1 w-full sm:w-auto"
           onClick={(e) => e.stopPropagation()}
         >
           {OUTCOMES.map((result) => {
@@ -163,7 +163,7 @@ export function FixturePredictor({ fixture, focusTeamId, currentPct, deltas }: P
                 key={result}
                 onClick={() => handleResultClick(result)}
                 disabled={isOtherLocked}
-                className="px-2.5 py-1 rounded border text-xs font-medium transition-all"
+                className="flex-1 sm:flex-none px-2.5 py-1.5 rounded border text-xs font-medium transition-all"
                 style={deltaStyle(diff, isLocked, isOtherLocked)}
               >
                 {label}
