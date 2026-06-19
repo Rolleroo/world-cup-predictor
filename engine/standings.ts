@@ -51,7 +51,6 @@ export function computeStandings(
       home.played++;
       away.played++;
 
-      // Use user-entered score override, then real fixture score
       const scoreOvr = scoreOverrides[String(fixtureId)];
       const score = scoreOvr ?? fixture.score;
       if (score) {
@@ -82,7 +81,7 @@ export function computeStandings(
     }
 
     const sorted = Object.values(standings).sort((a, b) =>
-      compareStandings(a, b, fixtures, group.fixtureIds, overrides, config)
+      compareStandings(a, b, fixtures, group.fixtureIds, overrides, config, scoreOverrides)
     );
     sorted.forEach((s, i) => (s.position = i + 1));
     result[groupId] = sorted;
@@ -97,7 +96,8 @@ export function compareStandings(
   fixtures: Record<number, Fixture>,
   groupFixtureIds: number[],
   overrides: OverrideMap,
-  config: CompetitionConfig
+  config: CompetitionConfig,
+  scoreOverrides: ScoreOverrideMap = {}
 ): number {
   for (const criterion of config.groupConfig.tiebreakers) {
     let diff = 0;
@@ -112,22 +112,22 @@ export function compareStandings(
         diff = b.goalsFor - a.goalsFor;
         break;
       case "HEAD_TO_HEAD_POINTS": {
-        const h2h = getH2HResult(a.teamId, b.teamId, groupFixtureIds, fixtures, overrides, config);
+        const h2h = getH2HResult(a.teamId, b.teamId, groupFixtureIds, fixtures, overrides, config, scoreOverrides);
         diff = h2h.bPoints - h2h.aPoints;
         break;
       }
       case "HEAD_TO_HEAD_GOAL_DIFFERENCE": {
-        const h2h = getH2HResult(a.teamId, b.teamId, groupFixtureIds, fixtures, overrides, config);
+        const h2h = getH2HResult(a.teamId, b.teamId, groupFixtureIds, fixtures, overrides, config, scoreOverrides);
         diff = h2h.bGD - h2h.aGD;
         break;
       }
       case "HEAD_TO_HEAD_GOALS_FOR": {
-        const h2h = getH2HResult(a.teamId, b.teamId, groupFixtureIds, fixtures, overrides, config);
+        const h2h = getH2HResult(a.teamId, b.teamId, groupFixtureIds, fixtures, overrides, config, scoreOverrides);
         diff = h2h.bGF - h2h.aGF;
         break;
       }
       case "DRAWING_OF_LOTS":
-        diff = 0; // treat as equal — stable sort handles it
+        diff = 0;
         break;
     }
     if (diff !== 0) return diff;
@@ -141,7 +141,8 @@ function getH2HResult(
   fixtureIds: number[],
   fixtures: Record<number, Fixture>,
   overrides: OverrideMap,
-  config: CompetitionConfig
+  config: CompetitionConfig,
+  scoreOverrides: ScoreOverrideMap = {}
 ) {
   let aPoints = 0, bPoints = 0, aGF = 0, bGF = 0, aGA = 0, bGA = 0;
 
@@ -157,10 +158,10 @@ function getH2HResult(
     if (!outcome) continue;
 
     const aIsHome = f.homeTeamId === teamA;
-
-    if (f.score) {
-      const aGoals = aIsHome ? f.score.homeGoals : f.score.awayGoals;
-      const bGoals = aIsHome ? f.score.awayGoals : f.score.homeGoals;
+    const scoreSource = scoreOverrides[String(f.id)] ?? f.score;
+    if (scoreSource) {
+      const aGoals = aIsHome ? scoreSource.homeGoals : scoreSource.awayGoals;
+      const bGoals = aIsHome ? scoreSource.awayGoals : scoreSource.homeGoals;
       aGF += aGoals;
       aGA += bGoals;
       bGF += bGoals;

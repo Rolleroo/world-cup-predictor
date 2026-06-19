@@ -33,8 +33,14 @@ export function TeamPredictor({ teamId }: Props) {
   );
 
   const deltas     = useDeltas(teamId, remainingFixtureIds);
-  const qualifyPct = probabilities[teamId] ?? 0;
-  const pct        = Math.round(qualifyPct * 100);
+  const qualifyPct    = probabilities[teamId] ?? 0;
+  const hasRemaining  = remainingFixtures.length > 0;
+  const pct           = Math.round(qualifyPct * 100);
+  const pctLabel      = qualifyPct === 1 ? "100%"
+                      : qualifyPct === 0 ? "0%"
+                      : hasRemaining && pct >= 99 ? ">99%"
+                      : hasRemaining && pct === 0 ? "<1%"
+                      : `${pct}%`;
 
   let pctColor = "text-red-400";
   if (pct >= 70) pctColor = "text-emerald-400";
@@ -59,7 +65,7 @@ export function TeamPredictor({ teamId }: Props) {
             ) : (
               <>
                 <div className={`text-5xl font-black tracking-tight leading-none ${pctColor}`}>
-                  {pct}%
+                  {pctLabel}
                 </div>
                 <p className="text-neutral-600 text-xs mt-0.5">chance of advancing</p>
               </>

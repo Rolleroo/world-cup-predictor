@@ -15,15 +15,21 @@ export function runSimulations(input: SimWorkerInput): SimulationUniverse {
     teamOrder,
     groupTeamIds,
     groupFixtureIds,
+    homeTeamIds,
+    awayTeamIds,
     forecastProbs,
     lambdaHome,
     lambdaAway,
     lockedOutcomes,
+    startingPts,
+    startingGd,
+    startingGf,
     pointsForWin,
     pointsForDraw,
     tiebreakers,
     directQualifiers,
     thirdPlaceAdvanceCount,
+    thirdPlaceSelectionCriteria,
     simCount,
   } = input;
 
@@ -36,10 +42,6 @@ export function runSimulations(input: SimWorkerInput): SimulationUniverse {
   for (let i = 0; i < teamCount; i++) teamIndex[teamOrder[i]] = i;
 
   const groups = Object.keys(groupTeamIds);
-
-  // homeTeamIds / awayTeamIds passed as extra fields (legacy cast)
-  const homeTeamIds = (input as SimWorkerInput & { homeTeamIds: number[] }).homeTeamIds;
-  const awayTeamIds = (input as SimWorkerInput & { awayTeamIds: number[] }).awayTeamIds;
 
   const groupFixtureCols: Record<string, number[]>  = {};
   const groupHomeTeam:    Record<string, number[]>  = {};
@@ -98,10 +100,12 @@ export function runSimulations(input: SimWorkerInput): SimulationUniverse {
       }
     }
 
-    // 2. Compute group standings (pts + GD + GF from sampled goals)
-    pts.fill(0);
-    gd.fill(0);
-    gf.fill(0);
+    // 2. Compute group standings — start from already-played results, add simulated ones
+    for (let i = 0; i < pts.length; i++) {
+      pts[i] = startingPts[i];
+      gd[i]  = startingGd[i];
+      gf[i]  = startingGf[i];
+    }
 
     for (let gi = 0; gi < groups.length; gi++) {
       const g      = groups[gi];
@@ -195,13 +199,15 @@ export function runSimulations(input: SimWorkerInput): SimulationUniverse {
         }
       }
 
-      // FIFA: rank thirds by pts → GD → GF → FIFA ranking (approx by order here)
       thirds.sort((a, b) => {
-        let diff = b.pts - a.pts;
-        if (diff !== 0) return diff;
-        diff = b.gd - a.gd;
-        if (diff !== 0) return diff;
-        return b.gf - a.gf;
+        for (const criterion of thirdPlaceSelectionCriteria as TiebreakerCriterion[]) {
+          let diff = 0;
+          if      (criterion === "POINTS")          diff = b.pts - a.pts;
+          else if (criterion === "GOAL_DIFFERENCE") diff = b.gd  - a.gd;
+          else if (criterion === "GOALS_FOR")       diff = b.gf  - a.gf;
+          if (diff !== 0) return diff;
+        }
+        return 0;
       });
 
       const qualBase = s * teamCount;

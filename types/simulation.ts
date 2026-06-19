@@ -38,11 +38,18 @@ export interface SimWorkerInput {
   // Per fixture: Poisson λ values for goal sampling
   lambdaHome: Float32Array;      // length = fixtureCount
   lambdaAway: Float32Array;      // length = fixtureCount
+  homeTeamIds: number[];         // parallel to fixtureOrder
+  awayTeamIds: number[];
   lockedOutcomes: Uint8Array;    // 255 = not locked, else 0/1/2
+  // Starting standings from already-finished matches, indexed [groupIdx * 4 + slotWithinGroup]
+  startingPts: Int32Array;
+  startingGd:  Int32Array;
+  startingGf:  Int32Array;
   pointsForWin: number;
   pointsForDraw: number;
   tiebreakers: string[];
   directQualifiers: number;
   thirdPlaceAdvanceCount: number;
+  thirdPlaceSelectionCriteria: string[];
   simCount: number;
 }

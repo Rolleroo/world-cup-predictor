@@ -68,7 +68,47 @@ export function StoreProvider({ initialState, children }: Props) {
       );
     }
 
-    const input: SimWorkerInput & { homeTeamIds: number[]; awayTeamIds: number[] } = {
+    // Pre-compute standings from already-finished fixtures so the simulation
+    // starts from the correct points/GD/GF baseline rather than zero
+    const groupOrder = Object.keys(groupTeamIds);
+    const maxSlots = 4;
+    const startingPts = new Int32Array(groupOrder.length * maxSlots);
+    const startingGd  = new Int32Array(groupOrder.length * maxSlots);
+    const startingGf  = new Int32Array(groupOrder.length * maxSlots);
+
+    for (let gi = 0; gi < groupOrder.length; gi++) {
+      const gid     = groupOrder[gi];
+      const group   = initialState.groups[gid];
+      const teamIds = groupTeamIds[gid];
+      const slot: Record<number, number> = {};
+      teamIds.forEach((tid, i) => { slot[tid] = i; });
+
+      for (const fid of group.fixtureIds) {
+        const f = initialState.fixtures[fid];
+        if (!f || f.status !== "FINISHED" || !f.result) continue;
+        const hSlot = slot[f.homeTeamId];
+        const aSlot = slot[f.awayTeamId];
+        if (hSlot === undefined || aSlot === undefined) continue;
+        const hBase = gi * maxSlots + hSlot;
+        const aBase = gi * maxSlots + aSlot;
+        if (f.result === "HOME_WIN") {
+          startingPts[hBase] += initialState.config.groupConfig.pointsForWin;
+        } else if (f.result === "AWAY_WIN") {
+          startingPts[aBase] += initialState.config.groupConfig.pointsForWin;
+        } else {
+          startingPts[hBase] += initialState.config.groupConfig.pointsForDraw;
+          startingPts[aBase] += initialState.config.groupConfig.pointsForDraw;
+        }
+        if (f.score) {
+          startingGf[hBase] += f.score.homeGoals;
+          startingGd[hBase] += f.score.homeGoals - f.score.awayGoals;
+          startingGf[aBase] += f.score.awayGoals;
+          startingGd[aBase] += f.score.awayGoals - f.score.homeGoals;
+        }
+      }
+    }
+
+    const input: SimWorkerInput = {
       fixtureOrder,
       teamOrder,
       groupTeamIds,
@@ -77,12 +117,16 @@ export function StoreProvider({ initialState, children }: Props) {
       lambdaHome,
       lambdaAway,
       lockedOutcomes,
+      startingPts,
+      startingGd,
+      startingGf,
       pointsForWin: initialState.config.groupConfig.pointsForWin,
       pointsForDraw: initialState.config.groupConfig.pointsForDraw,
       tiebreakers: initialState.config.groupConfig.tiebreakers,
       directQualifiers: initialState.config.groupConfig.directQualifiers,
       thirdPlaceAdvanceCount: initialState.config.groupConfig.thirdPlaceRule?.advanceCount ?? 0,
-      simCount: 10_000,
+      thirdPlaceSelectionCriteria: initialState.config.groupConfig.thirdPlaceRule?.selectionCriteria ?? ["POINTS", "GOAL_DIFFERENCE", "GOALS_FOR"],
+      simCount: 50_000,
       homeTeamIds,
       awayTeamIds,
     };
