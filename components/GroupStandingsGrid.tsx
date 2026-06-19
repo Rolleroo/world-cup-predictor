@@ -17,7 +17,7 @@ export function GroupStandingsGrid({ selectedTeamId, onSelect }: Props) {
   const groupIds = Object.keys(groups).sort();
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
       {groupIds.map((gid) => {
         const rows = standings[gid] ?? [];
         return (
@@ -32,9 +32,9 @@ export function GroupStandingsGrid({ selectedTeamId, onSelect }: Props) {
                 <tr className="border-b border-neutral-800/50">
                   <th className="text-left px-3 py-1 font-medium text-neutral-600 w-full">Team</th>
                   <th className="text-center px-1 py-1 font-medium text-neutral-600 w-5">P</th>
-                  <th className="hidden sm:table-cell text-center px-1 py-1 font-medium text-neutral-600 w-5">W</th>
-                  <th className="hidden sm:table-cell text-center px-1 py-1 font-medium text-neutral-600 w-5">D</th>
-                  <th className="hidden sm:table-cell text-center px-1 py-1 font-medium text-neutral-600 w-5">L</th>
+                  <th className="hidden md:table-cell text-center px-1 py-1 font-medium text-neutral-600 w-5">W</th>
+                  <th className="hidden md:table-cell text-center px-1 py-1 font-medium text-neutral-600 w-5">D</th>
+                  <th className="hidden md:table-cell text-center px-1 py-1 font-medium text-neutral-600 w-5">L</th>
                   <th className="text-center px-1 py-1 font-medium text-neutral-600 w-7">GD</th>
                   <th className="text-center px-1 py-1 font-medium text-neutral-600 w-7">Pts</th>
                 </tr>
@@ -67,9 +67,9 @@ export function GroupStandingsGrid({ selectedTeamId, onSelect }: Props) {
                         </div>
                       </td>
                       <td className="text-center px-1 py-1.5 text-neutral-500">{row.played}</td>
-                      <td className="hidden sm:table-cell text-center px-1 py-1.5 text-neutral-500">{row.won}</td>
-                      <td className="hidden sm:table-cell text-center px-1 py-1.5 text-neutral-500">{row.drawn}</td>
-                      <td className="hidden sm:table-cell text-center px-1 py-1.5 text-neutral-500">{row.lost}</td>
+                      <td className="hidden md:table-cell text-center px-1 py-1.5 text-neutral-500">{row.won}</td>
+                      <td className="hidden md:table-cell text-center px-1 py-1.5 text-neutral-500">{row.drawn}</td>
+                      <td className="hidden md:table-cell text-center px-1 py-1.5 text-neutral-500">{row.lost}</td>
                       <td className={`text-center px-1 py-1.5 tabular-nums ${
                         row.goalDifference > 0 ? "text-emerald-400" :
                         row.goalDifference < 0 ? "text-red-400" : "text-neutral-500"
