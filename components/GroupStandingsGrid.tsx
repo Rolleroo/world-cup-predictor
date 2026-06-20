@@ -17,7 +17,7 @@ export function GroupStandingsGrid({ selectedTeamId, onSelect }: Props) {
   const groupIds = Object.keys(groups).sort();
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5">
       {groupIds.map((gid) => {
         const rows = standings[gid] ?? [];
         return (

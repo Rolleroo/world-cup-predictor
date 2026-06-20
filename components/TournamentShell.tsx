@@ -25,6 +25,7 @@ function Inner() {
             {dataSource === "live" && (
               <span className="text-xs text-neutral-600">● live</span>
             )}
+            <span className="text-xs text-neutral-700">v2</span>
             <a
               href="#how-it-works"
               className="text-xs text-neutral-600 hover:text-neutral-400 transition-colors hidden sm:block"
