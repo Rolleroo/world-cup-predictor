@@ -4,8 +4,6 @@ import { fetchAllGroupStageEvents, fetchEspnStandings } from "@/lib/espnData";
 import { mapEspnResponse } from "@/lib/mapEspnResponse";
 import { getCompetitionConfig } from "@/config/competitions";
 
-export const dynamic = "force-dynamic";
-
 export default async function Home() {
   const config = getCompetitionConfig("WC2026");
 

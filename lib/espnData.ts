@@ -2,7 +2,7 @@ const SITE_BASE = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.wor
 const API_BASE  = "https://site.api.espn.com/apis/v2/sports/soccer/fifa.world";
 
 async function espnFetch<T>(url: string): Promise<T> {
-  const res = await fetch(url, { cache: "no-store" });
+  const res = await fetch(url, { next: { revalidate: 60 } });
   if (!res.ok) throw new Error(`ESPN ${url} → ${res.status}`);
   return res.json() as Promise<T>;
 }
