@@ -45,6 +45,9 @@ export interface SimWorkerInput {
   startingPts: Int32Array;
   startingGd:  Int32Array;
   startingGf:  Int32Array;
+  // H2H scores from already-finished fixtures: [groupIdx * 32 + homeSlot * 8 + awaySlot * 2 + (0=hg|1=ag)]
+  // -1 means the fixture hasn't been played yet (will be in the simulated buffers instead)
+  finishedH2H: Int32Array;
   pointsForWin: number;
   pointsForDraw: number;
   tiebreakers: string[];

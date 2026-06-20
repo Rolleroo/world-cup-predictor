@@ -24,6 +24,7 @@ export function runSimulations(input: SimWorkerInput): SimulationUniverse {
     startingPts,
     startingGd,
     startingGf,
+    finishedH2H,
     pointsForWin,
     pointsForDraw,
     tiebreakers,
@@ -152,9 +153,62 @@ export function runSimulations(input: SimWorkerInput): SimulationUniverse {
         const bb = gi * maxTeamsPerGroup + bti;
         for (const t of tiebreakers as TiebreakerCriterion[]) {
           let diff = 0;
-          if      (t === "POINTS")          diff = pts[bb] - pts[ab];
-          else if (t === "GOAL_DIFFERENCE") diff = gd[bb]  - gd[ab];
-          else if (t === "GOALS_FOR")       diff = gf[bb]  - gf[ab];
+          if (t === "POINTS") {
+            diff = pts[bb] - pts[ab];
+          } else if (t === "GOAL_DIFFERENCE") {
+            diff = gd[bb] - gd[ab];
+          } else if (t === "GOALS_FOR") {
+            diff = gf[bb] - gf[ab];
+          } else if (
+            t === "HEAD_TO_HEAD_POINTS" ||
+            t === "HEAD_TO_HEAD_GOAL_DIFFERENCE" ||
+            t === "HEAD_TO_HEAD_GOALS_FOR"
+          ) {
+            // Look up H2H goals between these two teams (pairwise)
+            const teamA = tIds[ati];
+            const teamB = tIds[bti];
+            let aGoals = -1, bGoals = -1;
+
+            // Check simulated (future) fixtures first
+            for (let fi = 0; fi < fCols.length; fi++) {
+              const hId = htIds[fi];
+              const aid = atIds[fi];
+              if ((hId === teamA && aid === teamB) || (hId === teamB && aid === teamA)) {
+                const col = fCols[fi];
+                const hg = homeGoalBuffer[base + col];
+                const ag = awayGoalBuffer[base + col];
+                if (hId === teamA) { aGoals = hg; bGoals = ag; }
+                else               { aGoals = ag; bGoals = hg; }
+                break;
+              }
+            }
+
+            // Fall back to already-finished H2H fixture
+            if (aGoals < 0) {
+              const hSlot = ati; const aSlot = bti;
+              let idx = gi * 32 + hSlot * 8 + aSlot * 2;
+              if (finishedH2H[idx] >= 0) {
+                aGoals = finishedH2H[idx]; bGoals = finishedH2H[idx + 1];
+              } else {
+                idx = gi * 32 + aSlot * 8 + hSlot * 2;
+                if (finishedH2H[idx] >= 0) {
+                  bGoals = finishedH2H[idx]; aGoals = finishedH2H[idx + 1];
+                }
+              }
+            }
+
+            if (aGoals >= 0) {
+              if (t === "HEAD_TO_HEAD_POINTS") {
+                const aH2H = aGoals > bGoals ? pointsForWin : aGoals === bGoals ? pointsForDraw : 0;
+                const bH2H = bGoals > aGoals ? pointsForWin : aGoals === bGoals ? pointsForDraw : 0;
+                diff = bH2H - aH2H;
+              } else if (t === "HEAD_TO_HEAD_GOAL_DIFFERENCE") {
+                diff = (bGoals - aGoals) - (aGoals - bGoals);
+              } else {
+                diff = bGoals - aGoals;
+              }
+            }
+          }
           if (diff !== 0) return diff;
         }
         return 0;
@@ -184,7 +238,33 @@ export function runSimulations(input: SimWorkerInput): SimulationUniverse {
           if (diff !== 0) return diff;
           diff = gd[bb] - gd[ab];
           if (diff !== 0) return diff;
-          return gf[bb] - gf[ab];
+          diff = gf[bb] - gf[ab];
+          if (diff !== 0) return diff;
+          // H2H pairwise for finding the correct 3rd-placed team
+          const teamA = tIds[ati]; const teamB = tIds[bti];
+          let aGoals = -1, bGoals = -1;
+          for (let fi = 0; fi < fCols.length; fi++) {
+            const hId = htIds[fi]; const aid = atIds[fi];
+            if ((hId === teamA && aid === teamB) || (hId === teamB && aid === teamA)) {
+              const col = fCols[fi];
+              const hg = homeGoalBuffer[base + col]; const ag = awayGoalBuffer[base + col];
+              if (hId === teamA) { aGoals = hg; bGoals = ag; } else { aGoals = ag; bGoals = hg; }
+              break;
+            }
+          }
+          if (aGoals < 0) {
+            let idx = gi * 32 + ati * 8 + bti * 2;
+            if (finishedH2H[idx] >= 0) { aGoals = finishedH2H[idx]; bGoals = finishedH2H[idx + 1]; }
+            else { idx = gi * 32 + bti * 8 + ati * 2; if (finishedH2H[idx] >= 0) { bGoals = finishedH2H[idx]; aGoals = finishedH2H[idx + 1]; } }
+          }
+          if (aGoals >= 0) {
+            const aH2H = aGoals > bGoals ? pointsForWin : aGoals === bGoals ? pointsForDraw : 0;
+            const bH2H = bGoals > aGoals ? pointsForWin : aGoals === bGoals ? pointsForDraw : 0;
+            diff = bH2H - aH2H;
+            if (diff !== 0) return diff;
+            diff = (bGoals - aGoals) - (aGoals - bGoals);
+          }
+          return diff;
         });
 
         const thirdSlot = positions[directQualifiers];

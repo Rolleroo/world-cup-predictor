@@ -75,6 +75,8 @@ export function StoreProvider({ initialState, children }: Props) {
     const startingPts = new Int32Array(groupOrder.length * maxSlots);
     const startingGd  = new Int32Array(groupOrder.length * maxSlots);
     const startingGf  = new Int32Array(groupOrder.length * maxSlots);
+    // finishedH2H: [gi * 32 + homeSlot * 8 + awaySlot * 2 + (0=hg|1=ag)], -1 = not played
+    const finishedH2H = new Int32Array(groupOrder.length * maxSlots * maxSlots * 2).fill(-1);
 
     for (let gi = 0; gi < groupOrder.length; gi++) {
       const gid     = groupOrder[gi];
@@ -104,6 +106,10 @@ export function StoreProvider({ initialState, children }: Props) {
           startingGd[hBase] += f.score.homeGoals - f.score.awayGoals;
           startingGf[aBase] += f.score.awayGoals;
           startingGd[aBase] += f.score.awayGoals - f.score.homeGoals;
+          // Store H2H score for use in tiebreaker
+          const h2hIdx = gi * 32 + hSlot * 8 + aSlot * 2;
+          finishedH2H[h2hIdx]     = f.score.homeGoals;
+          finishedH2H[h2hIdx + 1] = f.score.awayGoals;
         }
       }
     }
@@ -120,6 +126,7 @@ export function StoreProvider({ initialState, children }: Props) {
       startingPts,
       startingGd,
       startingGf,
+      finishedH2H,
       pointsForWin: initialState.config.groupConfig.pointsForWin,
       pointsForDraw: initialState.config.groupConfig.pointsForDraw,
       tiebreakers: initialState.config.groupConfig.tiebreakers,
