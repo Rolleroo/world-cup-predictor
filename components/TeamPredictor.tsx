@@ -51,39 +51,42 @@ export function TeamPredictor({ teamId }: Props) {
 
   return (
     <div className="border-t border-neutral-800 pt-8">
-      {/* Sticky team header + probability */}
-      <div className="sticky top-[44px] z-20 bg-neutral-950/95 backdrop-blur border-b border-neutral-800/60 -mx-4 px-4 py-3 mb-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs text-neutral-600 uppercase tracking-wider leading-none mb-0.5">Qualifying chances for</p>
-            <h2 className="text-xl font-black text-white leading-tight">{team.name}</h2>
-            <p className="text-neutral-500 text-xs">Group {team.groupId}</p>
+      {/* Fixed team header + probability — always visible below the nav bar */}
+      <div className="fixed top-[44px] left-0 right-0 z-20 bg-neutral-950/95 backdrop-blur border-b border-neutral-800/60">
+        <div className="max-w-7xl mx-auto px-4 py-2">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-neutral-600 uppercase tracking-wider leading-none mb-0.5">Qualifying chances for</p>
+              <h2 className="text-xl font-black text-white leading-tight">{team.name}</h2>
+              <p className="text-neutral-500 text-xs">Group {team.groupId}</p>
+            </div>
+            <div className="text-right">
+              {!universe ? (
+                <p className="text-neutral-500 text-sm animate-pulse">Simulating…</p>
+              ) : (
+                <>
+                  <div className={`text-5xl font-black tracking-tight leading-none ${pctColor}`}>
+                    {pctLabel}
+                  </div>
+                  <p className="text-neutral-600 text-xs mt-0.5">chance of advancing</p>
+                </>
+              )}
+            </div>
           </div>
-          <div className="text-right">
-            {!universe ? (
-              <p className="text-neutral-500 text-sm animate-pulse">Simulating…</p>
-            ) : (
-              <>
-                <div className={`text-5xl font-black tracking-tight leading-none ${pctColor}`}>
-                  {pctLabel}
-                </div>
-                <p className="text-neutral-600 text-xs mt-0.5">chance of advancing</p>
-              </>
-            )}
-          </div>
+          {universe && (
+            <div className="h-1 rounded-full bg-neutral-800 mt-2">
+              <div
+                className={`h-1 rounded-full transition-all duration-500 ${
+                  pct >= 70 ? "bg-emerald-500" : pct >= 40 ? "bg-yellow-500" : pct >= 15 ? "bg-orange-500" : "bg-red-500"
+                }`}
+                style={{ width: `${pct}%` }}
+              />
+            </div>
+          )}
         </div>
-        {/* Progress bar inside sticky header */}
-        {universe && (
-          <div className="h-1 rounded-full bg-neutral-800 mt-2">
-            <div
-              className={`h-1 rounded-full transition-all duration-500 ${
-                pct >= 70 ? "bg-emerald-500" : pct >= 40 ? "bg-yellow-500" : pct >= 15 ? "bg-orange-500" : "bg-red-500"
-              }`}
-              style={{ width: `${pct}%` }}
-            />
-          </div>
-        )}
       </div>
+      {/* Spacer so content doesn't hide behind the fixed bar (~80px) */}
+      <div className="h-20 mb-2" />
 
       {/* Controls row */}
       <div className="flex items-center justify-between mb-4">
