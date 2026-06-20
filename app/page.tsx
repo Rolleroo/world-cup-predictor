@@ -17,8 +17,8 @@ async function fetchTournamentState(): Promise<TournamentState> {
   try {
     const config = getCompetitionConfig("WC2026");
     const [fdTeams, fdMatches] = await Promise.all([
-      fetchTeams(config.apiCompetitionCode, 2026),
-      fetchMatches(config.apiCompetitionCode, 2026),
+      fetchTeams(config.apiCompetitionCode),
+      fetchMatches(config.apiCompetitionCode),
     ]);
     console.log(`Fetched ${fdMatches.length} matches, ${fdTeams.length} teams`);
     const finishedCount = fdMatches.filter((m) => m.status === "FINISHED").length;

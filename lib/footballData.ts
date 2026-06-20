@@ -73,15 +73,13 @@ export async function resolveCompetitionCode(code: string): Promise<string> {
   }
 }
 
-export async function fetchTeams(code: string, season: number): Promise<FdTeam[]> {
-  const data = await fdFetch<{ teams: FdTeam[] }>(`/competitions/${code}/teams?season=${season}`);
+export async function fetchTeams(code: string): Promise<FdTeam[]> {
+  const data = await fdFetch<{ teams: FdTeam[] }>(`/competitions/${code}/teams`);
   return data.teams;
 }
 
-export async function fetchMatches(code: string, season: number): Promise<FdMatch[]> {
-  const data = await fdFetch<{ matches: FdMatch[] }>(
-    `/competitions/${code}/matches?season=${season}`
-  );
+export async function fetchMatches(code: string): Promise<FdMatch[]> {
+  const data = await fdFetch<{ matches: FdMatch[] }>(`/competitions/${code}/matches`);
   return data.matches;
 }
 
