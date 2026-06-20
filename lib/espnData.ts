@@ -76,7 +76,7 @@ export async function fetchAllGroupStageEvents(): Promise<EspnEvent[]> {
   const end   = new Date(Math.min(Date.now(), new Date("2026-06-27T23:59:59Z").getTime()));
 
   const dates: string[] = [];
-  for (const d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
     dates.push(d.toISOString().slice(0, 10).replace(/-/g, ""));
   }
 
