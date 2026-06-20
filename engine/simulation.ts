@@ -228,8 +228,11 @@ export function runSimulations(input: SimWorkerInput): SimulationUniverse {
       const thirds: { teamId: number; pts: number; gd: number; gf: number }[] = [];
 
       for (let gi = 0; gi < groups.length; gi++) {
-        const g    = groups[gi];
-        const tIds = groupTeamIds[g];
+        const g      = groups[gi];
+        const tIds   = groupTeamIds[g];
+        const fCols3 = groupFixtureCols[g];
+        const htIds3 = groupHomeTeam[g];
+        const atIds3 = groupAwayTeam[g];
 
         const positions = tIds.map((_, ti) => ti).sort((ati, bti) => {
           const ab = gi * maxTeamsPerGroup + ati;
@@ -243,10 +246,10 @@ export function runSimulations(input: SimWorkerInput): SimulationUniverse {
           // H2H pairwise for finding the correct 3rd-placed team
           const teamA = tIds[ati]; const teamB = tIds[bti];
           let aGoals = -1, bGoals = -1;
-          for (let fi = 0; fi < fCols.length; fi++) {
-            const hId = htIds[fi]; const aid = atIds[fi];
+          for (let fi = 0; fi < fCols3.length; fi++) {
+            const hId = htIds3[fi]; const aid = atIds3[fi];
             if ((hId === teamA && aid === teamB) || (hId === teamB && aid === teamA)) {
-              const col = fCols[fi];
+              const col = fCols3[fi];
               const hg = homeGoalBuffer[base + col]; const ag = awayGoalBuffer[base + col];
               if (hId === teamA) { aGoals = hg; bGoals = ag; } else { aGoals = ag; bGoals = hg; }
               break;

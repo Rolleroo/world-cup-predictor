@@ -37,21 +37,20 @@ export function GroupTable({ groupId, standings }: Props) {
       <table className="w-full text-xs">
         <thead>
           <tr className="text-neutral-500 border-b border-neutral-800">
-            <th className="text-left px-3 py-1.5 font-normal w-6">#</th>
-            <th className="text-left px-2 py-1.5 font-normal">Team</th>
-            <th className="text-center px-2 py-1.5 font-normal">P</th>
-            <th className="text-center px-2 py-1.5 font-normal">W</th>
-            <th className="text-center px-2 py-1.5 font-normal">D</th>
-            <th className="text-center px-2 py-1.5 font-normal">L</th>
-            <th className="text-center px-2 py-1.5 font-normal">GD</th>
-            <th className="text-center px-2 py-1.5 font-normal">Pts</th>
-            <th className="text-right px-3 py-1.5 font-normal">Qual%</th>
+            <th className="text-left pl-2 pr-1 py-1.5 font-normal w-5">#</th>
+            <th className="text-left px-1 py-1.5 font-normal">Team</th>
+            <th className="text-center px-1 py-1.5 font-normal">P</th>
+            <th className="hidden sm:table-cell text-center px-1 py-1.5 font-normal">W</th>
+            <th className="hidden sm:table-cell text-center px-1 py-1.5 font-normal">D</th>
+            <th className="hidden sm:table-cell text-center px-1 py-1.5 font-normal">L</th>
+            <th className="text-center px-1 py-1.5 font-normal">GD</th>
+            <th className="text-center px-1 py-1.5 font-normal">Pts</th>
+            <th className="text-right pl-1 pr-2 py-1.5 font-normal">Qual%</th>
           </tr>
         </thead>
         <tbody>
           {standings.map((s, i) => {
             const directCutoff = config?.groupConfig.directQualifiers ?? 2;
-            const isQualLine = i === directCutoff - 1;
             const prob = probabilities[s.teamId] ?? 0;
 
             return (
@@ -62,20 +61,19 @@ export function GroupTable({ groupId, standings }: Props) {
                   i < directCutoff ? "bg-emerald-950/20" : "",
                 ].join(" ")}
               >
-                <td className="px-3 py-2 text-neutral-500">{s.position}</td>
-                <td className="px-2 py-2 text-neutral-200 font-medium">
-                  {/* Team name filled from store */}
-                  <TeamName teamId={s.teamId} />
+                <td className="pl-2 pr-1 py-2 text-neutral-500">{s.position}</td>
+                <td className="px-1 py-2 text-neutral-200 font-medium max-w-0 w-full">
+                  <span className="block truncate"><TeamName teamId={s.teamId} /></span>
                 </td>
-                <td className="px-2 py-2 text-center text-neutral-300">{s.played}</td>
-                <td className="px-2 py-2 text-center text-neutral-300">{s.won}</td>
-                <td className="px-2 py-2 text-center text-neutral-300">{s.drawn}</td>
-                <td className="px-2 py-2 text-center text-neutral-300">{s.lost}</td>
-                <td className="px-2 py-2 text-center text-neutral-300">
+                <td className="px-1 py-2 text-center text-neutral-300">{s.played}</td>
+                <td className="hidden sm:table-cell px-1 py-2 text-center text-neutral-300">{s.won}</td>
+                <td className="hidden sm:table-cell px-1 py-2 text-center text-neutral-300">{s.drawn}</td>
+                <td className="hidden sm:table-cell px-1 py-2 text-center text-neutral-300">{s.lost}</td>
+                <td className="px-1 py-2 text-center text-neutral-300">
                   {s.goalDifference > 0 ? `+${s.goalDifference}` : s.goalDifference}
                 </td>
-                <td className="px-2 py-2 text-center font-semibold text-neutral-100">{s.points}</td>
-                <td className="px-3 py-2 text-right">
+                <td className="px-1 py-2 text-center font-semibold text-neutral-100">{s.points}</td>
+                <td className="pl-1 pr-2 py-2 text-right">
                   {config ? <QualBadge prob={prob} config={config.groupConfig} /> : "—"}
                 </td>
               </tr>
