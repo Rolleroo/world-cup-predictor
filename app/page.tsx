@@ -1,33 +1,25 @@
 import type { TournamentState } from "@/types/tournament";
 import { TournamentShell } from "@/components/TournamentShell";
 import { mockTournamentState } from "@/lib/mockData";
-import { fetchTeams, fetchMatches, fetchStandings } from "@/lib/footballData";
-import { mapApiResponse } from "@/lib/mapApiResponse";
+import { fetchAllGroupStageEvents, fetchEspnStandings } from "@/lib/espnData";
+import { mapEspnResponse } from "@/lib/mapEspnResponse";
 import { getCompetitionConfig } from "@/config/competitions";
 
 export const dynamic = "force-dynamic";
 
 async function fetchTournamentState(): Promise<TournamentState> {
-  if (!process.env.FOOTBALL_DATA_API_KEY) {
-    console.warn("No FOOTBALL_DATA_API_KEY — using mock data");
-    return mockTournamentState;
-  }
-
-  console.log("Fetching live data from football-data.org...");
+  console.log("Fetching live data from ESPN...");
   try {
     const config = getCompetitionConfig("WC2026");
-    const [fdTeams, fdMatches] = await Promise.all([
-      fetchTeams(config.apiCompetitionCode),
-      fetchMatches(config.apiCompetitionCode),
+    const [espnEvents, espnGroups] = await Promise.all([
+      fetchAllGroupStageEvents(),
+      fetchEspnStandings(),
     ]);
-    console.log(`Fetched ${fdMatches.length} matches, ${fdTeams.length} teams`);
-    const finishedCount = fdMatches.filter((m) => m.status === "FINISHED").length;
-    console.log(`Finished matches: ${finishedCount}`);
-    const state = mapApiResponse(config, fdTeams, fdMatches, []);
-    console.log(`mapApiResponse OK — groups: ${Object.keys(state.groups).length}, standings: ${Object.keys(state.standings).length}`);
-    return state;
+    const finishedCount = espnEvents.filter((e) => e.status.type.completed).length;
+    console.log(`ESPN: ${espnEvents.length} events (${finishedCount} finished), ${espnGroups.length} groups`);
+    return mapEspnResponse(config, espnEvents, espnGroups);
   } catch (err) {
-    console.error("Live fetch failed — falling back to mock data. Error:", err instanceof Error ? err.stack : String(err));
+    console.error("ESPN fetch failed — falling back to mock data:", err instanceof Error ? err.stack : String(err));
     return mockTournamentState;
   }
 }
