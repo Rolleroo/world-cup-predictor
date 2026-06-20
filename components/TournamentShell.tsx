@@ -19,14 +19,11 @@ function Inner() {
             2026 World Cup Predictor
           </h1>
           <div className="flex items-center gap-3">
-            {dataSource && (
-              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                dataSource === "live"
-                  ? "bg-emerald-900/60 text-emerald-400 border border-emerald-800"
-                  : "bg-amber-900/60 text-amber-400 border border-amber-800"
-              }`}>
-                {dataSource === "live" ? "● Live" : "⚠ Mock data"}
-              </span>
+            {dataSource === "mock" && (
+              <span className="text-xs text-neutral-600">mock data</span>
+            )}
+            {dataSource === "live" && (
+              <span className="text-xs text-neutral-600">● live</span>
             )}
             <a
               href="#how-it-works"
