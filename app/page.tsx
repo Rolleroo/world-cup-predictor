@@ -9,9 +9,11 @@ export const dynamic = "force-dynamic";
 
 async function fetchTournamentState(): Promise<TournamentState> {
   if (!process.env.FOOTBALL_DATA_API_KEY) {
+    console.warn("No FOOTBALL_DATA_API_KEY — using mock data");
     return mockTournamentState;
   }
 
+  console.log("Fetching live data from football-data.org...");
   try {
     const config = getCompetitionConfig("WC2026");
     const [fdTeams, fdMatches, fdStandings] = await Promise.all([
@@ -19,9 +21,10 @@ async function fetchTournamentState(): Promise<TournamentState> {
       fetchMatches(config.apiCompetitionCode, 2026),
       fetchStandings(config.apiCompetitionCode, 2026),
     ]);
+    console.log(`Fetched ${fdMatches.length} matches, ${fdTeams.length} teams`);
     return mapApiResponse(config, fdTeams, fdMatches, fdStandings);
   } catch (err) {
-    console.warn("Falling back to mock data:", err);
+    console.error("Live fetch failed, falling back to mock data:", err);
     return mockTournamentState;
   }
 }
