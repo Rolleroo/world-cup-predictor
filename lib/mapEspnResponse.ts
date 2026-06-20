@@ -72,13 +72,13 @@ export function mapEspnResponse(
     const gid = match[1].toUpperCase();
 
     standings[gid] = group.standings.entries
-      .map((entry, i) => {
+      .map((entry) => {
         const teamId = tlaToId[entry.team.abbreviation];
         if (!teamId) return null;
         return {
           teamId,
           groupId: gid,
-          position: i + 1,
+          position: 0,
           played:         getStat(entry.stats, "gamesPlayed"),
           won:            getStat(entry.stats, "wins"),
           drawn:          getStat(entry.stats, "ties"),
@@ -89,7 +89,9 @@ export function mapEspnResponse(
           points:         getStat(entry.stats, "points"),
         } as GroupStanding;
       })
-      .filter((r): r is GroupStanding => r !== null);
+      .filter((r): r is GroupStanding => r !== null)
+      .sort((a, b) => b.points - a.points || b.goalDifference - a.goalDifference || b.goalsFor - a.goalsFor)
+      .map((r, i) => ({ ...r, position: i + 1 }));
   }
 
   // For any groups not returned by ESPN (e.g. I–L), compute from finished fixtures
