@@ -16,13 +16,13 @@ async function fetchTournamentState(): Promise<TournamentState> {
   console.log("Fetching live data from football-data.org...");
   try {
     const config = getCompetitionConfig("WC2026");
-    const [fdTeams, fdMatches, fdStandings] = await Promise.all([
+    const [fdTeams, fdMatches] = await Promise.all([
       fetchTeams(config.apiCompetitionCode, 2026),
       fetchMatches(config.apiCompetitionCode, 2026),
-      fetchStandings(config.apiCompetitionCode, 2026),
     ]);
     console.log(`Fetched ${fdMatches.length} matches, ${fdTeams.length} teams`);
-    return mapApiResponse(config, fdTeams, fdMatches, fdStandings);
+    // Pass empty standings — mapApiResponse will compute them from match results
+    return mapApiResponse(config, fdTeams, fdMatches, []);
   } catch (err) {
     console.error("Live fetch failed, falling back to mock data:", err);
     return mockTournamentState;
