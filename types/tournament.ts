@@ -59,4 +59,5 @@ export interface TournamentState {
   scoreOverrides: ScoreOverrideMap;
   forecasts: Record<number, MatchForecast>;
   fetchedAt: string;
+  dataSource: "live" | "mock";
 }

@@ -5,9 +5,11 @@ import type { TournamentState } from "@/types/tournament";
 import { StoreProvider } from "@/store/storeProvider";
 import { GroupStandingsGrid } from "./GroupStandingsGrid";
 import { TeamPredictor } from "./TeamPredictor";
+import { useTournamentStore } from "@/store/tournamentStore";
 
 function Inner() {
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
+  const dataSource = useTournamentStore((s) => s.state?.dataSource);
 
   return (
     <div className="min-h-screen bg-neutral-950 text-neutral-100">
@@ -16,12 +18,23 @@ function Inner() {
           <h1 className="text-sm font-semibold text-neutral-300 tracking-tight">
             2026 World Cup Predictor
           </h1>
-          <a
-            href="#how-it-works"
-            className="text-xs text-neutral-600 hover:text-neutral-400 transition-colors hidden sm:block"
-          >
-            How the maths works ↓
-          </a>
+          <div className="flex items-center gap-3">
+            {dataSource && (
+              <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                dataSource === "live"
+                  ? "bg-emerald-900/60 text-emerald-400 border border-emerald-800"
+                  : "bg-amber-900/60 text-amber-400 border border-amber-800"
+              }`}>
+                {dataSource === "live" ? "● Live" : "⚠ Mock data"}
+              </span>
+            )}
+            <a
+              href="#how-it-works"
+              className="text-xs text-neutral-600 hover:text-neutral-400 transition-colors hidden sm:block"
+            >
+              How the maths works ↓
+            </a>
+          </div>
         </div>
       </header>
 

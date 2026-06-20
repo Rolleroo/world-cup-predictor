@@ -25,7 +25,7 @@ export interface FdTeam {
 }
 
 export interface FdScore {
-  fullTime: { home: number | null; away: number | null };
+  fullTime: { home: number | null; away: number | null } | null;
 }
 
 export interface FdMatch {

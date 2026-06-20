@@ -258,4 +258,5 @@ export const mockTournamentState: TournamentState = {
   scoreOverrides: {},
   forecasts: {},
   fetchedAt: new Date().toISOString(),
+  dataSource: "mock",
 };

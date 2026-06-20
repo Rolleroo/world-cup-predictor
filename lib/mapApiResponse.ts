@@ -11,8 +11,8 @@ function fdStatusToStatus(s: string): MatchStatus {
 }
 
 function scoreToResult(score: FdMatch["score"]): MatchResult | null {
-  const h = score.fullTime.home;
-  const a = score.fullTime.away;
+  const h = score?.fullTime?.home ?? null;
+  const a = score?.fullTime?.away ?? null;
   if (h === null || a === null) return null;
   if (h > a) return "HOME_WIN";
   if (a > h) return "AWAY_WIN";
@@ -71,8 +71,8 @@ export function mapApiResponse(
     const gid = parseGroupId(m.group);
     const status = fdStatusToStatus(m.status);
     const result = status === "FINISHED" ? scoreToResult(m.score) : null;
-    const homeGoals = m.score.fullTime.home;
-    const awayGoals = m.score.fullTime.away;
+    const homeGoals = m.score?.fullTime?.home ?? null;
+    const awayGoals = m.score?.fullTime?.away ?? null;
 
     const fixture: Fixture = {
       id: m.id,
@@ -158,5 +158,6 @@ export function mapApiResponse(
     scoreOverrides: {},
     forecasts: {},
     fetchedAt: new Date().toISOString(),
+    dataSource: "live" as const,
   };
 }

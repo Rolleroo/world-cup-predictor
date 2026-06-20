@@ -21,10 +21,13 @@ async function fetchTournamentState(): Promise<TournamentState> {
       fetchMatches(config.apiCompetitionCode, 2026),
     ]);
     console.log(`Fetched ${fdMatches.length} matches, ${fdTeams.length} teams`);
-    // Pass empty standings — mapApiResponse will compute them from match results
-    return mapApiResponse(config, fdTeams, fdMatches, []);
+    const finishedCount = fdMatches.filter((m) => m.status === "FINISHED").length;
+    console.log(`Finished matches: ${finishedCount}`);
+    const state = mapApiResponse(config, fdTeams, fdMatches, []);
+    console.log(`mapApiResponse OK — groups: ${Object.keys(state.groups).length}, standings: ${Object.keys(state.standings).length}`);
+    return state;
   } catch (err) {
-    console.error("Live fetch failed, falling back to mock data:", err);
+    console.error("Live fetch failed — falling back to mock data. Error:", err instanceof Error ? err.stack : String(err));
     return mockTournamentState;
   }
 }
