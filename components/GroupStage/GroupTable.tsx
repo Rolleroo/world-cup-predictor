@@ -16,7 +16,7 @@ function QualBadge({ prob, config }: { prob: number; config: { directQualifiers:
   else if (pct >= 40) color = "text-yellow-400";
   else if (pct >= 10) color = "text-orange-400";
   else color = "text-red-400";
-  return <span className={`font-mono text-sm font-semibold ${color}`}>{pct}%</span>;
+  return <span className={`font-mono text-xs font-semibold ${color}`}>{pct}%</span>;
 }
 
 export function GroupTable({ groupId, standings }: Props) {
@@ -34,18 +34,29 @@ export function GroupTable({ groupId, standings }: Props) {
           Group {groupId}
         </h3>
       </div>
-      <table className="w-full text-xs">
+      <table className="w-full text-xs table-fixed">
+        <colgroup>
+          <col className="w-6" />          {/* # */}
+          <col />                           {/* Team — takes remaining space */}
+          <col className="hidden sm:table-column w-6" /> {/* P */}
+          <col className="hidden sm:table-column w-6" /> {/* W */}
+          <col className="hidden sm:table-column w-6" /> {/* D */}
+          <col className="hidden sm:table-column w-6" /> {/* L */}
+          <col className="w-8" />           {/* GD */}
+          <col className="w-7" />           {/* Pts */}
+          <col className="w-10" />          {/* Q% */}
+        </colgroup>
         <thead>
           <tr className="text-neutral-500 border-b border-neutral-800">
-            <th className="text-left pl-2 pr-1 py-1.5 font-normal w-5">#</th>
+            <th className="text-left pl-2 py-1.5 font-normal">#</th>
             <th className="text-left px-1 py-1.5 font-normal">Team</th>
-            <th className="text-center px-1 py-1.5 font-normal">P</th>
+            <th className="hidden sm:table-cell text-center px-1 py-1.5 font-normal">P</th>
             <th className="hidden sm:table-cell text-center px-1 py-1.5 font-normal">W</th>
             <th className="hidden sm:table-cell text-center px-1 py-1.5 font-normal">D</th>
             <th className="hidden sm:table-cell text-center px-1 py-1.5 font-normal">L</th>
             <th className="text-center px-1 py-1.5 font-normal">GD</th>
             <th className="text-center px-1 py-1.5 font-normal">Pts</th>
-            <th className="text-right pl-1 pr-2 py-1.5 font-normal">Qual%</th>
+            <th className="text-right pr-2 py-1.5 font-normal">Q%</th>
           </tr>
         </thead>
         <tbody>
@@ -61,11 +72,11 @@ export function GroupTable({ groupId, standings }: Props) {
                   i < directCutoff ? "bg-emerald-950/20" : "",
                 ].join(" ")}
               >
-                <td className="pl-2 pr-1 py-2 text-neutral-500">{s.position}</td>
-                <td className="px-1 py-2 text-neutral-200 font-medium max-w-0 w-full">
-                  <span className="block truncate"><TeamName teamId={s.teamId} /></span>
+                <td className="pl-2 py-2 text-neutral-500">{s.position}</td>
+                <td className="px-1 py-2 text-neutral-200 font-medium overflow-hidden">
+                  <TeamName teamId={s.teamId} />
                 </td>
-                <td className="px-1 py-2 text-center text-neutral-300">{s.played}</td>
+                <td className="hidden sm:table-cell px-1 py-2 text-center text-neutral-300">{s.played}</td>
                 <td className="hidden sm:table-cell px-1 py-2 text-center text-neutral-300">{s.won}</td>
                 <td className="hidden sm:table-cell px-1 py-2 text-center text-neutral-300">{s.drawn}</td>
                 <td className="hidden sm:table-cell px-1 py-2 text-center text-neutral-300">{s.lost}</td>
@@ -73,7 +84,7 @@ export function GroupTable({ groupId, standings }: Props) {
                   {s.goalDifference > 0 ? `+${s.goalDifference}` : s.goalDifference}
                 </td>
                 <td className="px-1 py-2 text-center font-semibold text-neutral-100">{s.points}</td>
-                <td className="pl-1 pr-2 py-2 text-right">
+                <td className="pr-2 py-2 text-right">
                   {config ? <QualBadge prob={prob} config={config.groupConfig} /> : "—"}
                 </td>
               </tr>
