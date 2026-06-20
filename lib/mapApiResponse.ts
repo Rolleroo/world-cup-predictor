@@ -111,6 +111,38 @@ export function mapApiResponse(
     }));
   }
 
+  // If API standings unavailable, compute from finished fixtures
+  if (fdStandings.length === 0) {
+    const W = config.groupConfig.pointsForWin;
+    const D = config.groupConfig.pointsForDraw;
+    for (const [gid, group] of Object.entries(groups)) {
+      const rows: Record<number, GroupStanding> = {};
+      for (const [pos, tid] of group.teamIds.entries()) {
+        rows[tid] = { teamId: tid, groupId: gid, position: pos + 1, played: 0, won: 0, drawn: 0, lost: 0, goalsFor: 0, goalsAgainst: 0, goalDifference: 0, points: 0 };
+      }
+      for (const fid of group.fixtureIds) {
+        const f = fixtures[fid];
+        if (!f || f.status !== "FINISHED" || !f.result || !f.score) continue;
+        const h = rows[f.homeTeamId];
+        const a = rows[f.awayTeamId];
+        if (!h || !a) continue;
+        h.played++; a.played++;
+        h.goalsFor += f.score.homeGoals; h.goalsAgainst += f.score.awayGoals;
+        a.goalsFor += f.score.awayGoals; a.goalsAgainst += f.score.homeGoals;
+        h.goalDifference = h.goalsFor - h.goalsAgainst;
+        a.goalDifference = a.goalsFor - a.goalsAgainst;
+        if (f.result === "HOME_WIN") { h.won++; h.points += W; a.lost++; }
+        else if (f.result === "AWAY_WIN") { a.won++; a.points += W; h.lost++; }
+        else { h.drawn++; h.points += D; a.drawn++; a.points += D; }
+      }
+      const sorted = Object.values(rows).sort((x, y) =>
+        y.points - x.points || y.goalDifference - x.goalDifference || y.goalsFor - x.goalsFor
+      );
+      sorted.forEach((r, i) => { r.position = i + 1; });
+      standings[gid] = sorted;
+    }
+  }
+
   // Sort group teamIds alphabetically for stable display
   for (const g of Object.values(groups)) {
     g.teamIds.sort((a, b) => (teams[a]?.tla ?? "").localeCompare(teams[b]?.tla ?? ""));
