@@ -5,10 +5,10 @@ function headers() {
   return { "X-Auth-Token": API_KEY };
 }
 
-async function fdFetch<T>(path: string, revalidate = 60): Promise<T> {
+async function fdFetch<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
     headers: headers(),
-    next: { revalidate },
+    cache: "no-store",
   });
   if (!res.ok) {
     throw new Error(`football-data.org ${path} → ${res.status} ${res.statusText}`);
