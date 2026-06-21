@@ -4,6 +4,11 @@ import { fetchAllGroupStageEvents, fetchEspnStandings } from "@/lib/espnData";
 import { mapEspnResponse } from "@/lib/mapEspnResponse";
 import { getCompetitionConfig } from "@/config/competitions";
 
+// Always render server-side so data is fresh on every request.
+// The ESPN fetches below still use next: { revalidate: 60 } so concurrent
+// users share one set of API calls per minute rather than hammering ESPN.
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const config = getCompetitionConfig("WC2026");
 
