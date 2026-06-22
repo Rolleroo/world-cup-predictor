@@ -66,6 +66,9 @@ export function mapEspnResponse(
 
     fixtures[fixture.id] = {
       ...fixture,
+      // ESPN is the source of truth for the schedule — the mock fixture's
+      // date/matchday pairings are fabricated and can be wrong.
+      utcDate: event.date || fixture.utcDate,
       status,
       score:  hasScore ? { homeGoals, awayGoals } : null,
       result: status === "FINISHED" ? goalsToResult(homeGoals, awayGoals) : null,

@@ -70,10 +70,12 @@ export async function fetchEspnScoreboard(dateYYYYMMDD: string): Promise<EspnEve
   return data.events ?? [];
 }
 
-// Fetch all scoreboard events from tournament start up to today
+// Fetch all scoreboard events across the whole group stage — including
+// future dates, so upcoming fixtures (and their real dates/pairings) come
+// from ESPN rather than the fabricated mock schedule.
 export async function fetchAllGroupStageEvents(): Promise<EspnEvent[]> {
   const start = new Date("2026-06-11");
-  const end   = new Date(Math.min(Date.now(), new Date("2026-06-27T23:59:59Z").getTime()));
+  const end   = new Date("2026-06-27T23:59:59Z");
 
   const dates: string[] = [];
   for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
