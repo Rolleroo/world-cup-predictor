@@ -33,9 +33,9 @@ export interface SimWorkerInput {
   teamOrder: number[];
   groupTeamIds: Record<string, number[]>;
   groupFixtureIds: Record<string, number[]>;
-  // Per fixture: [homeWinProb, drawProb] — awayWin = 1 - both
-  forecastProbs: Float32Array;   // length = fixtureCount * 2
-  // Per fixture: Poisson λ values for goal sampling
+  // Per fixture: Poisson λ values for goal sampling. These are the sole
+  // source of each match's win/draw/loss distribution — the outcome is
+  // derived from the sampled scoreline, not from any separate W/D/L probs.
   lambdaHome: Float32Array;      // length = fixtureCount
   lambdaAway: Float32Array;      // length = fixtureCount
   homeTeamIds: number[];         // parallel to fixtureOrder

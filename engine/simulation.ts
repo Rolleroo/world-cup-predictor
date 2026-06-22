@@ -17,7 +17,8 @@ export function runSimulations(input: SimWorkerInput): SimulationUniverse {
     groupFixtureIds,
     homeTeamIds,
     awayTeamIds,
-    forecastProbs,
+    // Match win/draw/loss is determined entirely by the Poisson-sampled
+    // scoreline below — there is no separate W/D/L probability input.
     lambdaHome,
     lambdaAway,
     lockedOutcomes,

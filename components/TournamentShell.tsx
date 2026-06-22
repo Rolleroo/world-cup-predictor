@@ -43,7 +43,7 @@ function Inner() {
           <p>Click any team in the group tables below to see their current chance of qualifying for the Round of 32.</p>
           <p>Then pick results for upcoming fixtures — the button colours show the impact on your team&apos;s chances: <span className="text-emerald-400">green = helps</span>, <span className="text-red-400">red = hurts</span>, grey = little effect. Expand a fixture to enter a specific score.</p>
           <p className="text-neutral-500 text-xs">
-            Probabilities are based on 10,000 simulations per page load using Elo ratings and a Poisson goal model.{" "}
+            Probabilities are based on 50,000 simulations per page load using Elo ratings and a Poisson goal model.{" "}
             <a href="#how-it-works" className="underline hover:text-neutral-300 transition-colors">See how it works ↓</a>
           </p>
         </div>
@@ -85,7 +85,7 @@ function Inner() {
             <div className="space-y-2">
               <h3 className="text-neutral-300 font-semibold">Monte Carlo simulation</h3>
               <p>
-                We run 10,000 complete simulations of the remaining tournament. In each one, every unplayed match gets a randomly
+                We run 50,000 complete simulations of the remaining tournament. In each one, every unplayed match gets a randomly
                 sampled scoreline. Group standings are computed for all 12 groups, and the 8 best third-placed teams advance alongside
                 the top two from each group — exactly as FIFA&apos;s rules dictate.
               </p>
@@ -95,7 +95,7 @@ function Inner() {
               <h3 className="text-neutral-300 font-semibold">Colour-coded impact</h3>
               <p>
                 When you pick a result, the other buttons show what would happen to your team&apos;s qualifying probability
-                if that result occurred across all 10,000 simulations. The colour gradient runs from bright green (big positive impact)
+                if that result occurred across all 50,000 simulations. The colour gradient runs from bright green (big positive impact)
                 through grey (little effect) to deep red (significant harm). The intensity scales continuously with the size of the effect.
               </p>
             </div>
@@ -103,7 +103,7 @@ function Inner() {
             <div className="space-y-2">
               <h3 className="text-neutral-300 font-semibold">Live data</h3>
               <p>
-                Match results and standings are fetched from football-data.org each time the page loads. Finished matches are locked in
+                Match results and standings are fetched from ESPN each time the page loads. Finished matches are locked in
                 as known results; only remaining fixtures are simulated. The model updates automatically as the tournament progresses.
               </p>
             </div>
@@ -112,8 +112,8 @@ function Inner() {
               <h3 className="text-neutral-300 font-semibold">Limitations</h3>
               <p>
                 Elo ratings reflect past performance and don&apos;t account for injuries, squad rotation, or dead-rubber incentives.
-                Head-to-head tiebreakers are approximated where scores are unknown. With 10,000 simulations, probabilities are accurate
-                to within roughly ±1 percentage point.
+                Head-to-head tiebreakers are approximated where scores are unknown. With 50,000 simulations, probabilities are accurate
+                to within roughly ±0.5 percentage point.
               </p>
             </div>
           </div>

@@ -46,13 +46,10 @@ export function StoreProvider({ initialState, children }: Props) {
     const awayTeamIds = remainingFixtures.map((f) => f.awayTeamId);
     const teamOrder = Object.values(initialState.teams).map((t) => t.id);
 
-    const forecastProbs = new Float32Array(fixtureOrder.length * 2);
     const lambdaHome    = new Float32Array(fixtureOrder.length);
     const lambdaAway    = new Float32Array(fixtureOrder.length);
     for (let i = 0; i < fixtureOrder.length; i++) {
       const fc = forecasts[fixtureOrder[i]];
-      forecastProbs[i * 2]     = fc?.homeWinProb ?? 0.35;
-      forecastProbs[i * 2 + 1] = fc?.drawProb    ?? 0.28;
       lambdaHome[i]            = fc?.lambdaHome   ?? 1.3;
       lambdaAway[i]            = fc?.lambdaAway   ?? 1.3;
     }
@@ -119,7 +116,6 @@ export function StoreProvider({ initialState, children }: Props) {
       teamOrder,
       groupTeamIds,
       groupFixtureIds,
-      forecastProbs,
       lambdaHome,
       lambdaAway,
       lockedOutcomes,
