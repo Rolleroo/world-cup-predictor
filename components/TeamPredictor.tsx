@@ -15,6 +15,7 @@ export function TeamPredictor({ teamId }: Props) {
   const fixtures      = useTournamentStore((s) => s.state?.fixtures);
   const probabilities = useTournamentStore((s) => s.probabilities);
   const universe      = useTournamentStore((s) => s.universe);
+  const simulating    = useTournamentStore((s) => s.simulating);
   const overrideCount = useTournamentStore((s) =>
     s.state ? Object.keys(s.state.overrides).length : 0
   );
@@ -65,10 +66,12 @@ export function TeamPredictor({ teamId }: Props) {
                 <p className="text-neutral-500 text-sm animate-pulse">Simulating…</p>
               ) : (
                 <>
-                  <div className={`text-5xl font-black tracking-tight leading-none ${pctColor}`}>
+                  <div className={`text-5xl font-black tracking-tight leading-none ${pctColor} ${simulating ? "opacity-60" : ""} transition-opacity`}>
                     {pctLabel}
                   </div>
-                  <p className="text-neutral-600 text-xs mt-0.5">chance of advancing</p>
+                  <p className="text-neutral-600 text-xs mt-0.5">
+                    {simulating ? <span className="animate-pulse">refining…</span> : "chance of advancing"}
+                  </p>
                 </>
               )}
             </div>

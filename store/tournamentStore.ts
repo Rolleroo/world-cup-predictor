@@ -16,6 +16,7 @@ interface TournamentStore {
   hydrate: (initial: TournamentState) => void;
   setForecasts: (forecasts: Record<number, MatchForecast>) => void;
   setUniverse: (universe: SimulationUniverse) => void;
+  setSimulating: (simulating: boolean) => void;
   setOverride: (fixtureId: number, result: MatchResult, goals?: { homeGoals: number; awayGoals: number }) => void;
   clearOverride: (fixtureId: number) => void;
   clearAllOverrides: () => void;
@@ -47,6 +48,10 @@ export const useTournamentStore = create<TournamentStore>((set, get) => ({
     const filtered = filterUniverse(universe, state.overrides);
     const probabilities = computeProbabilities(universe, filtered);
     set({ universe, probabilities, simulating: false });
+  },
+
+  setSimulating(simulating) {
+    set({ simulating });
   },
 
   setOverride(fixtureId, result, goals) {
