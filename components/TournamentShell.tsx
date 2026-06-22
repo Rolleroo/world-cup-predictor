@@ -76,9 +76,10 @@ function Inner() {
             <div className="space-y-2">
               <h3 className="text-neutral-300 font-semibold">Poisson goal model</h3>
               <p>
-                Rather than just simulating win/draw/loss, we simulate actual scorelines. The Elo win probability is used to derive
-                two Poisson parameters (λ) — one for each team&apos;s expected goals — constrained so the average total goals matches
-                the World Cup average of 2.6 per game. Goals are then sampled independently for each team.
+                Rather than just simulating win/draw/loss, we simulate actual scorelines. The Elo gap between the two teams sets
+                each team&apos;s expected goals (λ): an even match averages the World Cup norm of ~2.6 total goals, while a bigger
+                mismatch raises both the favourite&apos;s expected goals and the total — so stronger teams win by realistic margins.
+                Goals are then sampled independently for each team from a Poisson distribution.
               </p>
             </div>
 
