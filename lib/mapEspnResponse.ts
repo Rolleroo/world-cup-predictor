@@ -39,20 +39,30 @@ export function mapEspnResponse(
     const awayComp = comp.competitors.find((c) => c.homeAway === "away");
     if (!homeComp || !awayComp) continue;
 
-    const homeId = tlaToId[homeComp.team.abbreviation];
-    const awayId = tlaToId[awayComp.team.abbreviation];
-    if (!homeId || !awayId) continue;
+    const espnHomeId = tlaToId[homeComp.team.abbreviation];
+    const espnAwayId = tlaToId[awayComp.team.abbreviation];
+    if (!espnHomeId || !espnAwayId) continue;
 
-    // Find the matching fixture by home+away team
+    // Match on the unordered pair of teams — ESPN's home/away designation
+    // for a neutral-venue WC match may not match our seed fixture's, so
+    // matching strictly on (home, away) would miss the swapped games and
+    // leave finished matches sitting in the predictor as still-pickable.
     const fixture = Object.values(fixtures).find(
-      (f) => f.homeTeamId === homeId && f.awayTeamId === awayId
+      (f) =>
+        (f.homeTeamId === espnHomeId && f.awayTeamId === espnAwayId) ||
+        (f.homeTeamId === espnAwayId && f.awayTeamId === espnHomeId)
     );
     if (!fixture) continue;
 
     const status = espnStatusToMatchStatus(event.status.type.name);
-    const homeGoals = parseInt(homeComp.score ?? "0", 10);
-    const awayGoals = parseInt(awayComp.score ?? "0", 10);
+    const espnHomeGoals = parseInt(homeComp.score ?? "0", 10);
+    const espnAwayGoals = parseInt(awayComp.score ?? "0", 10);
     const hasScore  = status === "FINISHED" || status === "IN_PLAY";
+
+    // Orient the score to OUR fixture's home/away, not ESPN's
+    const sameOrientation = fixture.homeTeamId === espnHomeId;
+    const homeGoals = sameOrientation ? espnHomeGoals : espnAwayGoals;
+    const awayGoals = sameOrientation ? espnAwayGoals : espnHomeGoals;
 
     fixtures[fixture.id] = {
       ...fixture,
